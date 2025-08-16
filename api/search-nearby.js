@@ -1,4 +1,6 @@
-// api/search-nearby.js
+// api/search-nearby.js - 공통 모듈 사용
+import { extractRegionFromAddress } from '../lib/region-parser.js';
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
@@ -8,16 +10,29 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
     
-    const { lat, lng, radius = 1000, exclude } = req.query;
+    const { lat, lng, radius = 1000, exclude, address } = req.query;
     
     if (!lat || !lng) {
         return res.status(400).json({ error: '위도와 경도가 필요합니다' });
     }
     
     try {
+        // 🔥 공통 모듈 사용
+        let searchQuery = "치과";
+        
+        if (address) {
+            const region = extractRegionFromAddress(address); // 공통 함수 사용
+            searchQuery = `${region} 치과`;
+            console.log(`📍 주소: "${address}"`);
+            console.log(`📍 추출된 지역: "${region}"`);
+            console.log(`🔍 최종 검색어: "${searchQuery}"`);
+        }
+
+        const encodedQuery = encodeURIComponent(searchQuery);
+
         // 중심점 기준으로 넓은 범위 검색 (네이버 API는 정확한 반경 검색 미지원)
         const response = await fetch(
-            `https://openapi.naver.com/v1/search/local.json?query=동대문구 제기동 치과&display=50`,
+            `https://openapi.naver.com/v1/search/local.json?query=${encodedQuery}&display=50`,
             {
                 method: 'GET',
                 headers: {
@@ -56,7 +71,8 @@ export default async function handler(req, res) {
             const itemLat = item.mapy / 10000000;
             const itemLng = item.mapx / 10000000;
             
-            if (itemLat && itemLng) {
+            // 한국 지역 내의 좌표인지 검증
+            if (itemLat && itemLng && itemLat > 30 && itemLat < 40 && itemLng > 120 && itemLng < 135) {
                 const distance = calculateDistance(centerLat, centerLng, itemLat, itemLng);
                 const name = item.title.replace(/<[^>]*>/g, '');
                 
@@ -88,6 +104,8 @@ export default async function handler(req, res) {
             success: true,
             center: { lat: centerLat, lng: centerLng },
             radius: radiusMeters,
+            searchQuery: searchQuery,
+            originalAddress: address,
             total: nearbyDentists.length,
             items: nearbyDentists.slice(0, 20) // 최대 20개만 반환
         });
