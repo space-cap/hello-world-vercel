@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     try {
         // 중심점 기준으로 넓은 범위 검색 (네이버 API는 정확한 반경 검색 미지원)
         const response = await fetch(
-            `https://openapi.naver.com/v1/search/local.json?query=치과&display=50`,
+            `https://openapi.naver.com/v1/search/local.json?query=동대문구 제기동 치과&display=50`,
             {
                 method: 'GET',
                 headers: {
