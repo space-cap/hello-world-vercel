@@ -581,43 +581,66 @@
         let isCompetitorMode = false;
         let competitorCenter = null;
 
-        // 주변 치과 검색 함수
-        async function searchNearby(lat, lng, currentDentistName) {
-            console.log(`${currentDentistName} 주변 1km 검색 시작`);
+        // 🔥 업데이트된 주변 치과 검색 함수
+        async function searchNearby(lat, lng, currentDentistName, currentAddress) {
+            console.log(`🏥 ${currentDentistName} 주변 1km 검색 시작`);
+            console.log(`📍 중심 좌표: lat=${lat}, lng=${lng}`);
+            console.log(`🏠 주소: ${currentAddress}`);
 
             // 로딩 상태
             loadingDiv.style.display = 'block';
             errorDiv.style.display = 'none';
+            resultsDiv.innerHTML = '';
 
             try {
-                const response = await fetch(`/api/search-nearby?lat=${lat}&lng=${lng}&radius=1000&exclude=${encodeURIComponent(currentDentistName)}`);
+                // 주소 정보를 포함해서 API 호출
+                const params = new URLSearchParams({
+                    lat: lat,
+                    lng: lng,
+                    radius: 1000,
+                    exclude: currentDentistName,
+                    address: currentAddress || '' // 주소 정보 추가
+                });
+
+                console.log(`🔍 API 호출: /api/search-nearby?${params}`);
+
+                const response = await fetch(`/api/search-nearby?${params}`);
                 const data = await response.json();
+
+                console.log('📊 API 응답:', data);
 
                 if (!data.success) {
                     throw new Error(data.error);
                 }
 
-                console.log('주변 검색 결과:', data);
-                console.log(`발견된 경쟁업체: ${data.items.length}개`); // 디버깅용 로그
+                console.log(`✅ 검색어: "${data.searchQuery}"`);
+                console.log(`✅ 발견된 경쟁업체: ${data.items.length}개`);
 
                 // 경쟁업체 모드로 전환
                 isCompetitorMode = true;
-                competitorCenter = { lat: lat, lng: lng, name: currentDentistName };
+                competitorCenter = {
+                    lat: lat,
+                    lng: lng,
+                    name: currentDentistName,
+                    address: currentAddress,
+                    searchQuery: data.searchQuery
+                };
 
-                // 결과 표시
+                // 결과 표시 (개선된 버전)
                 displayCompetitorResults(data, currentDentistName);
 
                 // 지도에 마커 표시
                 displayCompetitorMarkersOnMap(data.items, lat, lng, currentDentistName);
 
             } catch (error) {
-                console.error('주변 검색 오류:', error);
-                errorDiv.textContent = '주변 치과 검색 중 오류가 발생했습니다: ' + error.message;
+                console.error('🚨 주변 검색 오류:', error);
+                errorDiv.textContent = `주변 치과 검색 중 오류가 발생했습니다: ${error.message}`;
                 errorDiv.style.display = 'block';
             } finally {
                 loadingDiv.style.display = 'none';
             }
         }
+
 
         // 경쟁업체 결과 표시 함수
         function displayCompetitorResults(data, centerDentistName) {
