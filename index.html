@@ -4,54 +4,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World - Vercel</title>
+    <title>치과 검색 서비스</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .container {
-            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
             background: white;
-            padding: 50px;
-            border-radius: 20px;
+            padding: 30px;
+            border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
+            text-align: center;
             color: #333;
-            font-size: 3em;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
         }
 
-        p {
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 15px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
             color: #666;
-            font-size: 1.2em;
+        }
+
+        .results {
+            margin-top: 20px;
+        }
+
+        .dentist-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .dentist-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .dentist-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .dentist-info {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .error {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>🎉 Hello World!</h1>
-        <p>Vercel 배포 성공!</p>
-        <p>현재 시간: <span id="time"></span></p>
+        <h1>🦷 치과 검색 서비스</h1>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="지역명을 입력하세요 (예: 동대문구, 강남구)" />
+            <button id="searchBtn">검색</button>
+        </div>
+
+        <div id="loadingDiv" class="loading" style="display: none;">
+            🔍 치과를 검색 중입니다...
+        </div>
+
+        <div id="errorDiv" class="error" style="display: none;"></div>
+
+        <div id="resultsDiv" class="results"></div>
     </div>
 
     <script>
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('time').textContent = now.toLocaleString('ko-KR');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const loadingDiv = document.getElementById('loadingDiv');
+        const errorDiv = document.getElementById('errorDiv');
+        const resultsDiv = document.getElementById('resultsDiv');
+
+        // 검색 버튼 클릭 이벤트
+        searchBtn.addEventListener('click', searchDentists);
+
+        // 엔터키 이벤트
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchDentists();
+            }
+        });
+
+        async function searchDentists() {
+            const query = searchInput.value.trim();
+
+            if (!query) {
+                alert('검색할 지역명을 입력해주세요!');
+                return;
+            }
+
+            // UI 상태 초기화
+            loadingDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+            resultsDiv.innerHTML = '';
+            searchBtn.disabled = true;
+
+            try {
+                // 서버리스 함수 호출
+                const response = await fetch(`/api/search-dentists?query=${encodeURIComponent(query)}&display=10`);
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error);
+                }
+
+                displayResults(data.items, data.total);
+
+            } catch (error) {
+                console.error('검색 오류:', error);
+                errorDiv.textContent = '검색 중 오류가 발생했습니다: ' + error.message;
+                errorDiv.style.display = 'block';
+            } finally {
+                loadingDiv.style.display = 'none';
+                searchBtn.disabled = false;
+            }
         }
-        updateTime();
-        setInterval(updateTime, 1000);
+
+        function displayResults(dentists, total) {
+            if (dentists.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        😔 검색 결과가 없습니다.<br>
+                        다른 지역명으로 검색해보세요.
+                    </div>
+                `;
+                return;
+            }
+
+            resultsDiv.innerHTML = `
+                <h3>💡 ${total}개의 치과를 찾았습니다 (상위 ${dentists.length}개 표시)</h3>
+                ${dentists.map((dentist, index) => `
+                    <div class="dentist-card">
+                        <div class="dentist-name">${index + 1}. ${dentist.name}</div>
+                        <div class="dentist-info">📍 주소: ${dentist.address}</div>
+                        <div class="dentist-info">🛣️ 도로명: ${dentist.roadAddress}</div>
+                        <div class="dentist-info">📞 전화: ${dentist.telephone}</div>
+                        <div class="dentist-info">🏷️ 분류: ${dentist.category}</div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        // 페이지 로드 시 예시 검색
+        window.addEventListener('load', () => {
+            searchInput.placeholder = '지역명을 입력하세요 (예: 동대문구, 강남구)';
+        });
     </script>
 </body>
 

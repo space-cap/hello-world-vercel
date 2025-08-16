@@ -1,0 +1,3 @@
+# .gitignore에 추가
+.env.local
+.env
