@@ -454,7 +454,7 @@
                                 <p>🏷️ ${dentist.category}</p>
                                 <hr style="margin: 8px 0;">
                                 <p style="color: #007bff; cursor: pointer;" 
-                                   onclick="openNaverMap(${lat}, ${lng}, \`${competitor.name}\`)">
+                                   onclick="openNaverMap(${lat}, ${lng}, \`${dentist.name}\`)">
                                    🗺️ 네이버지도에서 보기
                                 </p>
                             </div>
@@ -769,7 +769,7 @@
                     document.querySelectorAll('.dentist-card').forEach(card => {
                         card.classList.remove('selected');
                     });
-                    const targetCard = document.querySelector(`[data - index="${index}"]`);
+                    const targetCard = document.querySelector(`[data-index="${index}"]`);
                     if (targetCard) {
                         targetCard.classList.add('selected');
                     }
@@ -823,7 +823,7 @@
                 document.querySelectorAll('.dentist-card').forEach(card => {
                     card.classList.remove('selected');
                 });
-                document.querySelector(`[data - index= "${index}"]`).classList.add('selected');
+                document.querySelector(`[data-index="${index}"]`).classList.add('selected');
             }
         }
 
