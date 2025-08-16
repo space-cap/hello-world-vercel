@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 치과 검색 서비스 테스트 센터</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #343a40;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .test-menu {
+            padding: 30px;
+        }
+
+        .test-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .test-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .test-description {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .test-button {
+            background: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        .test-button:hover {
+            background: #0056b3;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 치과 검색 서비스 테스트 센터</h1>
+            <p>개발 중인 기능들을 테스트할 수 있는 도구들</p>
+        </div>
+
+        <div class="test-menu">
+            <div class="test-item">
+                <div class="test-title">🗺️ 지역명 추출기 테스트</div>
+                <div class="test-description">
+                    전국 주소에서 네이버 API 검색용 지역명을 정확히 추출하는지 테스트합니다.
+                    서울, 부산, 경기도, 강원도 등 27개 실제 주소로 검증합니다.
+                </div>
+                <button class="test-button" onclick="location.href='region-extractor.html'">
+                    테스트 시작하기
+                </button>
+            </div>
+
+            <div class="test-item">
+                <div class="test-title">🏥 API 연동 테스트 (예정)</div>
+                <div class="test-description">
+                    네이버 검색 API와 지도 API 연동 상태를 확인하고,
+                    실제 검색 결과의 정확성을 테스트합니다.
+                </div>
+                <button class="test-button" disabled style="background: #6c757d;">
+                    개발 예정
+                </button>
+            </div>
+
+            <div class="test-item">
+                <div class="test-title">📊 성능 테스트 (예정)</div>
+                <div class="test-description">
+                    검색 속도, 거리 계산 정확도, 마커 표시 성능 등을
+                    종합적으로 테스트합니다.
+                </div>
+                <button class="test-button" disabled style="background: #6c757d;">
+                    개발 예정
+                </button>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="../index.html">← 메인 서비스로 돌아가기</a>
+        </div>
+    </div>
+</body>
+
+</html>
