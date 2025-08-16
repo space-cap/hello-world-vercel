@@ -278,11 +278,38 @@
         <div id="results" class="results"></div>
     </div>
 
-    <!-- 공통 함수 로드 -->
+    <!-- 🔥 공통 모듈 로드 -->
+    <script src="../lib/region-parser.js"></script>
     <script src="utils.js"></script>
 
     <script>
         let testResults = [];
+
+        // 공통 모듈이 로드되었는지 확인하고 시작
+        window.addEventListener('load', async function () {
+            // RegionParser가 로드될 때까지 기다리기
+            while (!window.RegionParser) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            // 이제 안전하게 사용 가능
+            console.log('✅ 공통 모듈 로드 완료');
+
+            document.getElementById('results').innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #6c757d;">
+                    <h3>🎯 테스트 도구 사용법</h3>
+                    <p style="margin: 20px 0; line-height: 1.6;">
+                        1. <strong>"전체 테스트 실행"</strong> 버튼으로 ${window.RegionParser.TEST_ADDRESSES.length}개 주소 일괄 테스트<br>
+                        2. 위 입력창에 주소를 입력하고 <strong>"단일 테스트"</strong><br>
+                        3. <strong>"랜덤 테스트"</strong>로 무작위 주소 테스트
+                    </p>
+                    <p style="color: #28a745; font-weight: bold;">
+                        ✅ 시작하려면 아무 버튼이나 클릭하세요!<br>
+                        <small style="color: #6c757d;">공통 모듈(lib/region-parser.js) 사용 중</small>
+                    </p>
+                </div>
+            `;
+        });
 
         function testSingleAddress() {
             const address = document.getElementById('customAddress').value.trim();
