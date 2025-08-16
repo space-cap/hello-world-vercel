@@ -390,7 +390,7 @@
                 <div class="dentist-card" data-index="${index}" onclick="focusMarker(${index})">
                     <div class="dentist-header">
                         <div class="dentist-name">${index + 1}. ${dentist.name}</div>
-                        <button class="radius-btn" onclick="event.stopPropagation(); searchNearby(${lat}, ${lng}, '${dentist.name.replace(/'/g, '\\\'')}')">
+                        <button class="radius-btn" onclick="event.stopPropagation(); searchNearby(${lat}, ${lng}, '${dentist.name.replace(/'/g, '\\\'')}', '${dentist.address}')">
                             📍 1km
                         </button>
                     </div>
