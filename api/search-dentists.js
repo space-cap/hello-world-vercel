@@ -38,7 +38,7 @@ export default async function handler(req, res) {
             name: item.title.replace(/<[^>]*>/g, ''), // HTML 태그 제거
             address: item.address,
             roadAddress: item.roadAddress,
-            telephone: item.telephone || '전화번호 없음',
+            telephone: item.telephone || '⚠️ 전화번호 정보 없음 (네이버 정책상 제공 안됨)',
             category: item.category,
             mapx: item.mapx,
             mapy: item.mapy
