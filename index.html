@@ -176,6 +176,10 @@
                 const response = await fetch(`/api/search-dentists?query=${encodeURIComponent(query)}&display=10`);
                 const data = await response.json();
 
+                // 🔍 디버깅: API 응답 전체 확인
+                console.log('=== 네이버 API 전체 응답 ===');
+                console.log(data);
+
                 if (!data.success) {
                     throw new Error(data.error);
                 }
