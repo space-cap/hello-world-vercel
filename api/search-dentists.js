@@ -26,12 +26,21 @@ export default async function handler(req, res) {
                 }
             }
         );
-        
+                
         if (!response.ok) {
             throw new Error(`API 호출 실패: ${response.status}`);
         }
-        
+
         const data = await response.json();
+
+        // 🔍 서버에서 원본 응답 로깅
+        console.log('=== 네이버 API 원본 응답 ===');
+        console.log(JSON.stringify(data, null, 2));
+
+        // 각 항목의 telephone 필드 확인
+        data.items.forEach((item, index) => {
+            console.log(`치과 ${index + 1} - 전화번호:`, item.telephone);
+        });
         
         // 데이터 정제
         const dentists = data.items.map(item => ({
