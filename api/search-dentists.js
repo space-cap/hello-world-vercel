@@ -9,7 +9,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
     
-    const { query, display = 5 } = req.query;
+    const { query, display = 10 } = req.query;
     
     if (!query) {
         return res.status(400).json({ error: '검색어가 필요합니다' });
