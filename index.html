@@ -495,11 +495,24 @@
         }
 
         function clearMarkers() {
-            markers.forEach(marker => marker.setMap(null));
-            infoWindows.forEach(infoWindow => infoWindow.close());
+            markers.forEach(marker => {
+                if (marker.setMap) {
+                    marker.setMap(null); // 마커 제거
+                } else if (marker.getMap) {
+                    marker.setMap(null); // Circle 객체 제거
+                }
+            });
+
+            infoWindows.forEach(infoWindow => {
+                if (infoWindow.close) {
+                    infoWindow.close(); // 정보창 닫기
+                }
+            });
+
             markers = [];
             infoWindows = [];
         }
+
 
         function focusMarker(index) {
             if (markers[index]) {
@@ -584,6 +597,8 @@
                     throw new Error(data.error);
                 }
 
+                console.log(`발견된 경쟁업체: ${data.items.length}개`); // 디버깅용 로그
+
                 // 경쟁업체 모드로 전환
                 isCompetitorMode = true;
                 competitorCenter = { lat: lat, lng: lng, name: currentDentistName };
@@ -645,7 +660,7 @@
     `;
         }
 
-        // 경쟁업체 지도 마커 표시
+        // 경쟁업체 지도 마커 표시 (수정된 버전)
         function displayCompetitorMarkersOnMap(competitors, centerLat, centerLng, centerName) {
             clearMarkers();
 
@@ -691,10 +706,22 @@
             markers.push(centerMarker);
             infoWindows.push(centerInfoWindow);
 
-            // 경쟁업체 마커들 (노란색)
+            // 경쟁업체 마커들 (노란색) - 여기서 오류 발생했던 부분 수정
             competitors.forEach((competitor, index) => {
+                // ✅ mapx, mapy가 있는지 확인 후 좌표 변환
+                if (!competitor.mapx || !competitor.mapy) {
+                    console.warn(`${competitor.name}: 좌표 정보 없음`);
+                    return; // 좌표가 없으면 건너뛰기
+                }
+
                 const lat = competitor.mapy / 10000000;
                 const lng = competitor.mapx / 10000000;
+
+                // ✅ 좌표 유효성 검사
+                if (!lat || !lng || lat < 30 || lat > 40 || lng < 120 || lng > 130) {
+                    console.warn(`${competitor.name}: 잘못된 좌표 lat=${lat}, lng=${lng}`);
+                    return;
+                }
 
                 const marker = new naver.maps.Marker({
                     position: new naver.maps.LatLng(lat, lng),
@@ -731,7 +758,7 @@
                        🗺️ 네이버지도에서 보기
                     </p >
                 </div >
-                    `
+                        `
                 });
 
                 naver.maps.Event.addListener(marker, 'click', function () {
@@ -742,7 +769,10 @@
                     document.querySelectorAll('.dentist-card').forEach(card => {
                         card.classList.remove('selected');
                     });
-                    document.querySelector(`[data - index="${index}"]`).classList.add('selected');
+                    const targetCard = document.querySelector(`[data - index="${index}"]`);
+                    if (targetCard) {
+                        targetCard.classList.add('selected');
+                    }
                 });
 
                 markers.push(marker);
@@ -763,14 +793,23 @@
 
             markers.push(circle); // 원도 markers 배열에 추가해서 나중에 제거
 
-            // 지도 범위 조정
+            // 지도 범위 조정 - 유효한 마커만 고려
             const bounds = new naver.maps.LatLngBounds();
             bounds.extend(new naver.maps.LatLng(centerLat, centerLng));
+
             competitors.forEach(competitor => {
-                bounds.extend(new naver.maps.LatLng(competitor.mapy / 10000000, competitor.mapx / 10000000));
+                if (competitor.mapx && competitor.mapy) {
+                    const lat = competitor.mapy / 10000000;
+                    const lng = competitor.mapx / 10000000;
+                    if (lat && lng && lat > 30 && lat < 40 && lng > 120 && lng < 130) {
+                        bounds.extend(new naver.maps.LatLng(lat, lng));
+                    }
+                }
             });
+
             map.fitBounds(bounds, { padding: 50 });
         }
+
 
         // 경쟁업체 마커에 포커스
         function focusCompetitorMarker(index) {
