@@ -597,6 +597,7 @@
                     throw new Error(data.error);
                 }
 
+                console.log('주변 검색 결과:', data);
                 console.log(`발견된 경쟁업체: ${data.items.length}개`); // 디버깅용 로그
 
                 // 경쟁업체 모드로 전환
