@@ -50,13 +50,19 @@ export default async function handler(req, res) {
             telephone: item.telephone || '⚠️ 전화번호 정보 없음 (네이버 정책상 제공 안됨)',
             category: item.category,
             mapx: item.mapx,
-            mapy: item.mapy
+            mapy: item.mapy,
+            // 🔍 디버깅용 원본 데이터 추가
+            originalData: item
         }));
         
         res.status(200).json({
             success: true,
             total: data.total,
-            items: dentists
+            items: dentists,
+            // 🔍 디버깅용 원본 응답 포함
+            debug: {
+                originalResponse: data
+            }
         });
         
     } catch (error) {
