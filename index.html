@@ -180,6 +180,17 @@
                 console.log('=== 네이버 API 전체 응답 ===');
                 console.log(data);
 
+                // 🔍 각 항목별 상세 확인
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach((item, index) => {
+                        console.log(`=== 치과 ${index + 1} ===`);
+                        console.log('이름:', item.name);
+                        console.log('전화번호:', item.telephone);
+                        console.log('주소:', item.address);
+                        console.log('전체 데이터:', item);
+                    });
+                }
+
                 if (!data.success) {
                     throw new Error(data.error);
                 }
